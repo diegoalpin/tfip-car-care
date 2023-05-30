@@ -1,0 +1,31 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: tfipcarcare-backend
+spec:
+  selector:
+    app: tfipcarcare-backend
+  ports:
+  - protocol: TCP
+    port: 8080
+  type: ClusterIP
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tfipcarcare-backend
+spec:
+  selector:
+      matchLabels:
+        app: tfipcarcare-backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: tfipcarcare-backend
+    spec:
+      containers:
+        - name: tfipcarcare-backend
+          image: diegoalpinncs/tfip-car-care-main:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
