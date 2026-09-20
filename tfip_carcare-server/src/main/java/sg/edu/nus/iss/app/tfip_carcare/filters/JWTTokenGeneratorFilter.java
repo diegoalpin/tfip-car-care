@@ -1,7 +1,6 @@
 package sg.edu.nus.iss.app.tfip_carcare.filters;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -15,7 +14,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -24,12 +22,17 @@ import sg.edu.nus.iss.app.tfip_carcare.constants.SecurityConstant;
 
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
 
+    private final SecretKey key;
+
+    public JWTTokenGeneratorFilter(SecretKey key) {
+        this.key = key;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (null != authentication) {
-            SecretKey key = Keys.hmacShaKeyFor(SecurityConstant.JWT_KEY.getBytes(StandardCharsets.UTF_8));
             
             String jwt = Jwts.builder().setIssuer("TFIP Car Care").setSubject("JWT Token")
                     .claim("username", authentication.getName())

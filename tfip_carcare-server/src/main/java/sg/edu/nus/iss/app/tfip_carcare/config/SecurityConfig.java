@@ -1,5 +1,9 @@
 package sg.edu.nus.iss.app.tfip_carcare.config;
 
+import java.nio.charset.StandardCharsets;
+import javax.crypto.SecretKey;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -23,7 +27,12 @@ import sg.edu.nus.iss.app.tfip_carcare.filters.JWTTokenValidatorFilter;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http,
+            @Value("${security.jwt.secret}") String jwtSecret) throws Exception {
+        if (jwtSecret.isBlank() || jwtSecret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalArgumentException("JWT_SECRET must contain at least 32 bytes of random key material");
+        }
+        SecretKey jwtKey = Keys.hmacShaKeyFor(jwtSecret.getBytes(StandardCharsets.UTF_8));
         // csrf enable means cannot post or put
         CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
         requestHandler.setCsrfRequestAttributeName("_csrf"); // default is also "_csrf"
@@ -46,8 +55,8 @@ public class SecurityConfig {
         });
         // 3. configure CSRF + JWT Filter + authorization level
         http.csrf().disable()
-                .addFilterAfter(new JWTTokenGeneratorFilter(), BasicAuthenticationFilter.class)
-                .addFilterBefore(new JWTTokenValidatorFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new JWTTokenGeneratorFilter(jwtKey), BasicAuthenticationFilter.class)
+                .addFilterBefore(new JWTTokenValidatorFilter(jwtKey), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests()
                 .requestMatchers("/api/myAccount","/api/car/**","/api/login","/api/item/**","/api/maintenance/**","/api/payment/**","api/customer/**","api/mq/**").authenticated()
                 .requestMatchers("/api/contactUs", "/api/register").permitAll()

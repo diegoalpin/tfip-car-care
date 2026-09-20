@@ -32,7 +32,6 @@ public class StripeController {
 
         // We initilize stripe object with the api key
         Stripe.apiKey = stripeApiKey;
-        System.out.println("Stripe secret is "+ stripeApiKey);
 
         // We create a stripe session parameters
         SessionCreateParams params = SessionCreateParams.builder()

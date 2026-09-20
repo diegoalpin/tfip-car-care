@@ -39,7 +39,6 @@ public class LoginController {
         }
         try {
             String hashPwd = passwordEncoder.encode((customer.getPwd()));
-            System.out.println("hashpwd is "+ hashPwd);
             customer.setPwd(hashPwd);
             savedCustomer = custRepo.save(customer);
 

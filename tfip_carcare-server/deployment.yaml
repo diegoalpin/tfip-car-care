@@ -9,6 +9,7 @@ spec:
   - protocol: TCP
     port: 8080
   type: ClusterIP
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -27,5 +28,8 @@ spec:
         - name: tfipcarcare-backend
           image: diegoalpinncs/tfip-car-care-main:latest
           imagePullPolicy: Always
+          envFrom:
+            - secretRef:
+                name: tfipcarcare-backend
           ports:
             - containerPort: 8080

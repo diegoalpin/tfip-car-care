@@ -34,7 +34,6 @@ public class AppConfig {
     
     @Bean(name = "stripeAPIKey")
     public String initStripeApiKey() {
-        System.out.println("Stripe secret is "+ stripeSecret);
         // Stripe.apiKey = stripeSecret;
         return stripeSecret;
     }
